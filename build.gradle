@@ -12,13 +12,14 @@ repositories {
 }
 
 dependencies {
+    implementation 'io.micronaut:micronaut-runtime'
     implementation 'io.micronaut.graphql:micronaut-graphql'
     implementation 'io.micronaut.serde:micronaut-serde-jackson'
     implementation 'io.micronaut.data:micronaut-data-hibernate-jpa'
     implementation 'io.micronaut.sql:micronaut-jdbc-hikari'
     implementation 'jakarta.annotation:jakarta.annotation-api'
 
-    runtimeOnly 'org.postgresql:postgresql' 
+    runtimeOnly 'org.postgresql:postgresql'
     runtimeOnly 'ch.qos.logback:logback-classic'
 
     annotationProcessor 'io.micronaut:micronaut-http-validation'
@@ -56,18 +57,9 @@ micronaut {
         incremental true
         annotations 'example.micronaut.*'
     }
-    aot {
-        optimizeServiceLoading false
-        convertYamlToJava false
-        precomputeOperations true
-        cacheEnvironment true
-        optimizeClassLoading true
-        deduceEnvironment true
-        optimizeNetty true
-        replaceLogbackXml true
-    }
 }
 
-tasks.named('dockerfileNative', io.micronaut.gradle.docker.DockerfileNative) {
+
+tasks.named('dockerfileNative') {
     jdkVersion.set('21')
 }
