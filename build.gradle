@@ -1,81 +1,73 @@
 plugins {
-    id("io.micronaut.application") version "4.5.3"
-    id("com.gradleup.shadow") version "8.3.6"
-    id("io.micronaut.aot") version "4.5.3"
+    id 'io.micronaut.application' version '4.5.3'
+    id 'com.gradleup.shadow' version '8.3.6'
+    id 'io.micronaut.aot' version '4.5.3'
 }
 
-version = "0.1"
-group = "example.micronaut"
+version = '0.1'
+group = 'example.micronaut'
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    // Annotation Processors
-    annotationProcessor("io.micronaut:micronaut-http-validation")
-    annotationProcessor("io.micronaut.serde:micronaut-serde-processor")
-    annotationProcessor("io.micronaut.data:micronaut-data-processor")
-    annotationProcessor("io.micronaut.graphql:micronaut-graphql-processor")
+    implementation 'io.micronaut.graphql:micronaut-graphql'
+    implementation 'io.micronaut.serde:micronaut-serde-jackson'
+    implementation 'io.micronaut.data:micronaut-data-hibernate-jpa'
+    implementation 'io.micronaut.sql:micronaut-jdbc-hikari'
+    implementation 'jakarta.annotation:jakarta.annotation-api'
 
-    // Serialization
-    implementation("io.micronaut.serde:micronaut-serde-jackson")
+    runtimeOnly 'org.postgresql:postgresql' 
+    runtimeOnly 'ch.qos.logback:logback-classic'
 
-    // Micronaut Data & Persistence
-    implementation("io.micronaut.data:micronaut-data-hibernate-jpa")
-    implementation("io.micronaut.data:micronaut-data-model")
-    implementation("io.micronaut.sql:micronaut-jdbc-hikari")
+    annotationProcessor 'io.micronaut:micronaut-http-validation'
+    annotationProcessor 'io.micronaut.serde:micronaut-serde-processor'
+    annotationProcessor 'io.micronaut.data:micronaut-data-processor'
 
-    // GraphQL Support
-    implementation("io.micronaut.graphql:micronaut-graphql")
-
-    // Logging
-    runtimeOnly("ch.qos.logback:logback-classic")
-
-    // Database Driver
-    runtimeOnly("org.postgresql:postgresql")
-
-    // Testing
-    testImplementation("io.micronaut:micronaut-http-client")
+    testImplementation 'io.micronaut:micronaut-http-client'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
 }
-
-
 
 application {
-    mainClass = "example.micronaut.Application"
+    mainClass.set('example.micronaut.Application')
 }
+
 java {
-    sourceCompatibility = JavaVersion.toVersion("21")
-    targetCompatibility = JavaVersion.toVersion("21")
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
 }
 
-
-graalvmNative.toolchainDetection = false
+graalvmNative {
+    toolchainDetection = false
+    binaries {
+        main {
+            imageName = 'mn-graalvm-application'
+            buildArgs.add('-Ob')
+        }
+    }
+}
 
 micronaut {
-    runtime("netty")
-    testRuntime("junit5")
+    runtime 'netty'
+    testRuntime 'junit5'
     processing {
-        incremental(true)
-        annotations("example.micronaut.*")
+        incremental true
+        annotations 'example.micronaut.*'
     }
     aot {
-        // Please review carefully the optimizations enabled below
-        // Check https://micronaut-projects.github.io/micronaut-aot/latest/guide/ for more details
-        optimizeServiceLoading = false
-        convertYamlToJava = false
-        precomputeOperations = true
-        cacheEnvironment = true
-        optimizeClassLoading = true
-        deduceEnvironment = true
-        optimizeNetty = true
-        replaceLogbackXml = true
+        optimizeServiceLoading false
+        convertYamlToJava false
+        precomputeOperations true
+        cacheEnvironment true
+        optimizeClassLoading true
+        deduceEnvironment true
+        optimizeNetty true
+        replaceLogbackXml true
     }
 }
 
-
-tasks.named("dockerfileNative") {
-    jdkVersion = "21"
+tasks.named('dockerfileNative', io.micronaut.gradle.docker.DockerfileNative) {
+    jdkVersion.set('21')
 }
-
-

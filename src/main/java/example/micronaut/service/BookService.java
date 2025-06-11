@@ -1,6 +1,7 @@
 package example.micronaut.service;
 
 import example.micronaut.model.Book;
+import example.micronaut.model.Author;
 import example.micronaut.repository.BookRepository;
 import io.micronaut.data.model.Page;
 import io.micronaut.data.model.Pageable;
@@ -76,4 +77,5 @@ public class BookService {
     public Book upsertBook(Book book) {
         return bookRepository.save(book);
     }
+
 }
