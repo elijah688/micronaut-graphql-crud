@@ -13,6 +13,8 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import javax.print.DocFlavor.STRING;
+
 @Singleton
 public class DataFetchers {
 
@@ -31,7 +33,7 @@ public class DataFetchers {
     public DataFetcher<Book> getBookByIdDataFetcher() {
         return env -> {
             String bookId = env.getArgument("id");
-            return bookService.getBookById(bookId);
+            return bookService.getBookById(UUID.fromString(bookId));
         };
     }
 
@@ -42,20 +44,15 @@ public class DataFetchers {
             String before = env.getArgument("before");
             String after = env.getArgument("after");
 
-            List<Book> allBooks = bookService.getBooks(before, after, first, last);
+            List<Book> allBooks = bookService.getBooks(UUID.fromString(before), UUID.fromString(after), first, last);
 
             // Cursor helper for encoding/decoding
             class CursorHelper {
-                String encode(String id) {
-                    return Base64.getEncoder().encodeToString(id.getBytes());
-                }
-
-                String decode(String cursor) {
-                    if (cursor == null)
-                        return null;
-                    return new String(Base64.getDecoder().decode(cursor));
+                String encode(UUID id) {
+                    return Base64.getEncoder().encodeToString(id.toString().getBytes());
                 }
             }
+
             CursorHelper cursorHelper = new CursorHelper();
 
             // Build edges
@@ -88,16 +85,16 @@ public class DataFetchers {
             Integer pageCount = (Integer) input.get("pageCount");
             String authorId = (String) input.get("authorId");
 
-            Book book = id != null ? bookService.getBookById(id) : null;
+            Book book = id != null ? bookService.getBookById(UUID.fromString(id)) : null;
             if (book == null) {
                 book = new Book();
-                book.setId(UUID.randomUUID().toString());
+                book.setId(UUID.randomUUID());
             }
 
             book.setName(name);
             book.setPageCount(pageCount);
 
-            Author author = authorService.getAuthorById(authorId);
+            Author author = authorService.getAuthorById(UUID.fromString(authorId));
             if (author == null) {
                 throw new RuntimeException("Author not found for id: " + authorId);
             }
@@ -110,7 +107,7 @@ public class DataFetchers {
     public DataFetcher<Author> getAuthorByIdDataFetcher() {
         return env -> {
             String authorId = env.getArgument("id");
-            return authorService.getAuthorById(authorId);
+            return authorService.getAuthorById(UUID.fromString(authorId));
         };
     }
 
@@ -122,14 +119,12 @@ public class DataFetchers {
             String firstName = (String) input.get("firstName");
             String lastName = (String) input.get("lastName");
 
-            Author author = id != null ? authorService.getAuthorById(id) : null;
-            if (author == null) {
-                author = new Author();
-                author.setId(UUID.randomUUID().toString());
+            Author author = new Author(UUID.randomUUID(), firstName, lastName);
+
+            if (id != null) {
+                author.setId(UUID.fromString(id));
             }
 
-            author.setFirstName(firstName);
-            author.setLastName(lastName);
 
             return authorService.upsertAuthor(author);
         };

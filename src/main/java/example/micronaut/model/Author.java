@@ -1,5 +1,7 @@
 package example.micronaut.model;
 
+import java.util.UUID;
+
 import io.micronaut.core.annotation.Introspected;
 import jakarta.persistence.*;
 
@@ -9,7 +11,7 @@ import jakarta.persistence.*;
 public class Author {
 
     @Id
-    private String id;
+    private UUID id;
 
     private String firstName;
 
@@ -18,19 +20,18 @@ public class Author {
     public Author() {
     }
 
-    public Author(String id, String firstName, String lastName) {
+    public Author(UUID id, String firstName, String lastName) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
     }
 
-    // Getters and Setters
 
-    public String getId() {
+    public UUID getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 

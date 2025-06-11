@@ -6,25 +6,23 @@ import io.micronaut.data.annotation.Repository;
 import io.micronaut.data.repository.CrudRepository;
 import java.util.Optional;
 import java.util.UUID;
-import io.micronaut.data.annotation.*;
-import io.micronaut.data.jdbc.annotation.JdbcRepository;
-import io.micronaut.data.model.query.builder.sql.Dialect;
+
 @Repository
-@JdbcRepository(dialect = Dialect.POSTGRES)
-public interface AuthorRepository extends CrudRepository<Author, String> {
+public interface AuthorRepository extends CrudRepository<Author, UUID> {
 
-    Optional<Author> findById(String id);
+    Optional<Author> findById(UUID id);
 
-    @Query("""
-            INSERT INTO authors (id, name, bio)
-            VALUES (:id, :name, :bio)
+    @Query(value = """
+            INSERT INTO authors (id, first_name, last_name)
+            VALUES (:id, :firstName, :lastName)
             ON CONFLICT (id) DO UPDATE
-              SET name = EXCLUDED.name,
-                  bio = EXCLUDED.bio
-            """)
-    void upsert(@BindBean Author author);
+              SET first_name = EXCLUDED.first_name,
+                  last_name = EXCLUDED.last_name
+            RETURNING *
+            """, nativeQuery = true)
+    Author upsert(UUID id, String firstName, String lastName);
 
-    boolean existsById(String id);
+    boolean existsById(UUID id);
 
-    void deleteById(String id);
+    void deleteById(UUID id);
 }
