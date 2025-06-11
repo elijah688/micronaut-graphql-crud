@@ -5,7 +5,6 @@ import jakarta.inject.Singleton;
 import example.micronaut.service.AuthorService;
 import example.micronaut.service.BookService;
 import example.micronaut.model.*;
-import example.micronaut.model.Book.*;
 import example.micronaut.model.BookConnection.*;
 
 import org.slf4j.Logger;
@@ -15,17 +14,16 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Singleton
-public class BookFetchers {
+public class DataFetchers {
 
-    private static final Logger LOG = LoggerFactory.getLogger(BookFetchers.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DataFetchers.class);
 
     private final BookService bookService;
     private final AuthorService authorService;
 
-    public BookFetchers(
+    public DataFetchers(
             BookService bookService,
-            AuthorService authorService
-    ) {
+            AuthorService authorService) {
         this.bookService = bookService;
         this.authorService = authorService;
     }
@@ -106,6 +104,34 @@ public class BookFetchers {
             book.setAuthor(author);
 
             return bookService.upsertBook(book);
+        };
+    }
+
+    public DataFetcher<Author> getAuthorByIdDataFetcher() {
+        return env -> {
+            String authorId = env.getArgument("id");
+            return authorService.getAuthorById(authorId);
+        };
+    }
+
+    public DataFetcher<Author> upsertAuthorDataFetcher() {
+        return env -> {
+            Map<String, Object> input = env.getArgument("input");
+
+            String id = (String) input.get("id");
+            String firstName = (String) input.get("firstName");
+            String lastName = (String) input.get("lastName");
+
+            Author author = id != null ? authorService.getAuthorById(id) : null;
+            if (author == null) {
+                author = new Author();
+                author.setId(UUID.randomUUID().toString());
+            }
+
+            author.setFirstName(firstName);
+            author.setLastName(lastName);
+
+            return authorService.upsertAuthor(author);
         };
     }
 }

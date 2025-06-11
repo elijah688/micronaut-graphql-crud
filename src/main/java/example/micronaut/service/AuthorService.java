@@ -18,6 +18,6 @@ public class AuthorService {
     }
 
     public Author upsertAuthor(Author author) {
-        return authorRepository.save(author);
+        return authorRepository.upsert(author);
     }
 }

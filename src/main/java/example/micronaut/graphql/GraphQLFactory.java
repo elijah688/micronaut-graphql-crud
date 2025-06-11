@@ -28,7 +28,7 @@ public class GraphQLFactory {
     @Bean
     @Singleton
     public GraphQL graphQL(ResourceResolver resourceResolver,
-                           BookFetchers graphQLDataFetchers) {
+            DataFetchers graphQLDataFetchers) {
         SchemaParser schemaParser = new SchemaParser();
         TypeDefinitionRegistry typeRegistry = new TypeDefinitionRegistry();
 
@@ -42,12 +42,16 @@ public class GraphQLFactory {
             }
 
             RuntimeWiring runtimeWiring = RuntimeWiring.newRuntimeWiring()
-                .type(newTypeWiring("Query")
-                    .dataFetcher("bookById", graphQLDataFetchers.getBookByIdDataFetcher())
-                    .dataFetcher("books", graphQLDataFetchers.getBooksDataFetcher()))
-                .type(newTypeWiring("Mutation")
-                    .dataFetcher("upsertBook", graphQLDataFetchers.upsertBookDataFetcher()))
-                .build();
+                    .type(newTypeWiring("Query")
+                            .dataFetcher("bookById", graphQLDataFetchers.getBookByIdDataFetcher())
+                            .dataFetcher("books", graphQLDataFetchers.getBooksDataFetcher())
+                            .dataFetcher("authorById", graphQLDataFetchers.getAuthorByIdDataFetcher())
+
+                    )
+                    .type(newTypeWiring("Mutation")
+                            .dataFetcher("upsertBook", graphQLDataFetchers.upsertBookDataFetcher())
+                            .dataFetcher("upsertAuthor", graphQLDataFetchers.upsertAuthorDataFetcher()))
+                    .build();
 
             SchemaGenerator schemaGenerator = new SchemaGenerator();
             GraphQLSchema graphQLSchema = schemaGenerator.makeExecutableSchema(typeRegistry, runtimeWiring);

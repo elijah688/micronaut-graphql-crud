@@ -7,7 +7,11 @@ import io.micronaut.data.model.Pageable;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
+import io.micronaut.data.annotation.Repository;
+
+@Repository
 public interface BookRepository extends PageableRepository<Book, String> {
 
     Optional<Book> findById(String id);
@@ -24,6 +28,14 @@ public interface BookRepository extends PageableRepository<Book, String> {
     @Query("SELECT b FROM Book b ORDER BY b.id DESC")
     List<Book> findAllDesc(Pageable pageable);
 
-    <S extends Book> S save(S entity);
+    @Query("""
+            INSERT INTO books (id, author_id, name, page_count)
+            VALUES (:id, :authorId, :name, :pageCount)
+            ON CONFLICT (id) DO UPDATE
+              SET author_id = EXCLUDED.author_id,
+                  name = EXCLUDED.name,
+                  page_count = EXCLUDED.page_count
+            """)
+    void upsert(UUID id, UUID authorId, String name, Integer pageCount);
 
 }

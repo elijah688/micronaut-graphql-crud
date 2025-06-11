@@ -15,7 +15,8 @@ public class Book {
 
     private int pageCount;
 
-    @Embedded
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "author_id")
     private Author author;
 
     public Book() {
@@ -28,7 +29,6 @@ public class Book {
         this.author = author;
     }
 
-    // Getters and Setters for Book
 
     public String getId() {
         return id;
@@ -71,5 +71,4 @@ public class Book {
                 ", author=" + author +
                 '}';
     }
-
 }

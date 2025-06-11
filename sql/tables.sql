@@ -1,17 +1,16 @@
 CREATE TABLE IF NOT EXISTS authors (
-    id VARCHAR(255) PRIMARY KEY,
-    first_name VARCHAR(255) NOT NULL,
-    last_name VARCHAR(255) NOT NULL
+    id TEXT PRIMARY KEY,
+    first_name TEXT NOT NULL,
+    last_name TEXT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS books (
-    id VARCHAR(255) PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
     page_count INT NOT NULL,
-    author_id VARCHAR(255) NOT NULL,
+    author_id TEXT NOT NULL,
     CONSTRAINT fk_author
         FOREIGN KEY(author_id) 
         REFERENCES authors(id)
         ON DELETE CASCADE
 );
-
