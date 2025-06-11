@@ -2,9 +2,9 @@ package example.micronaut;
 
 import graphql.schema.DataFetcher;
 import jakarta.inject.Singleton;
-
-import example.micronaut.repository.DbRepository;
+import example.micronaut.repository.BookRepository;
 import example.micronaut.model.*;
+import example.micronaut.model.Book.*;
 import example.micronaut.model.BookConnection.*;
 
 import java.util.*;
@@ -12,15 +12,14 @@ import java.util.stream.Collectors;
 
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Singleton
 public class GraphQLDataFetchers {
     private static final Logger LOG = LoggerFactory.getLogger(GraphQLDataFetchers.class);
 
-    private final DbRepository dbRepository;
+    private final BookRepository dbRepository;
 
-    public GraphQLDataFetchers(DbRepository dbRepository) {
+    public GraphQLDataFetchers(BookRepository dbRepository) {
         this.dbRepository = dbRepository;
     }
 

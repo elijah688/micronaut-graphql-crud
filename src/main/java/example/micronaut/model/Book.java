@@ -1,17 +1,24 @@
 package example.micronaut.model;
 
 import io.micronaut.core.annotation.Introspected;
+import jakarta.persistence.*;
 
 @Introspected
+@Entity
+@Table(name = "books")
 public class Book {
 
+    @Id
     private String id;
+
     private String name;
+
     private int pageCount;
+
+    @Embedded
     private Author author;
 
     public Book() {
-        // no-arg constructor needed for frameworks/serialization
     }
 
     public Book(String id, String name, int pageCount, Author author) {
@@ -21,48 +28,42 @@ public class Book {
         this.author = author;
     }
 
-    // Getters
-    public String getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public int getPageCount() {
-        return pageCount;
-    }
-
-    public Author getAuthor() {
-        return author;
-    }
-
-    // Setters
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setPageCount(int pageCount) {
-        this.pageCount = pageCount;
-    }
-
-    public void setAuthor(Author author) {
-        this.author = author;
-    }
+    // Getters/setters omitted for brevity
 
     @Override
     public String toString() {
         return "Book{" +
-                "id='" + id + '\'' +
-                ", name='" + name + '\'' +
-                ", pageCount=" + pageCount +
-                ", author=" + author +
-                '}';
+               "id='" + id + '\'' +
+               ", name='" + name + '\'' +
+               ", pageCount=" + pageCount +
+               ", author=" + author +
+               '}';
     }
 
+    @Embeddable
+    @Introspected
+    public static class Author {
+        private String id;
+        private String firstName;
+        private String lastName;
+
+        public Author() {}
+
+        public Author(String id, String firstName, String lastName) {
+            this.id = id;
+            this.firstName = firstName;
+            this.lastName = lastName;
+        }
+
+        // Getters/setters omitted
+
+        @Override
+        public String toString() {
+            return "Author{" +
+                   "id='" + id + '\'' +
+                   ", firstName='" + firstName + '\'' +
+                   ", lastName='" + lastName + '\'' +
+                   '}';
+        }
+    }
 }

@@ -12,20 +12,33 @@ repositories {
 }
 
 dependencies {
+    // Annotation Processors
     annotationProcessor("io.micronaut:micronaut-http-validation")
     annotationProcessor("io.micronaut.serde:micronaut-serde-processor")
+    annotationProcessor("io.micronaut.data:micronaut-data-processor")
+    annotationProcessor("io.micronaut.graphql:micronaut-graphql-processor")
+
+    // Serialization
     implementation("io.micronaut.serde:micronaut-serde-jackson")
-    compileOnly("io.micronaut:micronaut-http-client")
-    runtimeOnly("ch.qos.logback:logback-classic")
-    testImplementation("io.micronaut:micronaut-http-client")
+
+    // Micronaut Data & Persistence
+    implementation("io.micronaut.data:micronaut-data-hibernate-jpa")
+    implementation("io.micronaut.data:micronaut-data-model")
+    implementation("io.micronaut.sql:micronaut-jdbc-hikari")
+
+    // GraphQL Support
     implementation("io.micronaut.graphql:micronaut-graphql")
+
+    // Logging
     runtimeOnly("ch.qos.logback:logback-classic")
 
-    implementation("io.micronaut.data:micronaut-data-hibernate-jpa")
-    implementation("io.micronaut.sql:micronaut-jdbc-hikari")
+    // Database Driver
     runtimeOnly("org.postgresql:postgresql")
 
+    // Testing
+    testImplementation("io.micronaut:micronaut-http-client")
 }
+
 
 
 application {

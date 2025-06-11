@@ -32,7 +32,7 @@ public class GraphQLFactory {
         SchemaParser schemaParser = new SchemaParser();
 
         TypeDefinitionRegistry typeRegistry = new TypeDefinitionRegistry();
-        Optional<InputStream> graphqlSchema = resourceResolver.getResourceAsStream("classpath:schema.graphqls");
+        Optional<InputStream> graphqlSchema = resourceResolver.getResourceAsStream("classpath:schema.graphql");
 
         if (graphqlSchema.isPresent()) {
             typeRegistry.merge(schemaParser.parse(new BufferedReader(new InputStreamReader(graphqlSchema.get()))));
