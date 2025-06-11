@@ -34,6 +34,14 @@ public class BookConnection {
         this.pageInfo = pageInfo;
     }
 
+    @Override
+    public String toString() {
+        return "BookConnection{" +
+                "edges=" + edges +
+                ", pageInfo=" + pageInfo +
+                '}';
+    }
+
     @Introspected
     public static class BookEdge {
         private String cursor;
@@ -61,6 +69,14 @@ public class BookConnection {
 
         public void setNode(Book node) {
             this.node = node;
+        }
+
+        @Override
+        public String toString() {
+            return "BookEdge{" +
+                    "cursor='" + cursor + '\'' +
+                    ", node=" + node +
+                    '}';
         }
     }
 

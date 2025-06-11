@@ -42,11 +42,7 @@ public class GraphQLDataFetchers {
             String after = env.getArgument("after");
 
 
-            LOG.info("Pagination args -> first: {}, last: {}, before: '{}', after: '{}'", first, last, before, after);
-            LOG.info("Pagination args -> first: {}, last: {}, before: '{}', after: '{}'", first, last, before, after);
-            LOG.info("Pagination args -> first: {}, last: {}, before: '{}', after: '{}'", first, last, before, after);
-            LOG.info("Pagination args -> first: {}, last: {}, before: '{}', after: '{}'", first, last, before, after);
-
+         
 
             List<Book> allBooks = dbRepository.findAllBooks();
 
@@ -117,6 +113,8 @@ public class GraphQLDataFetchers {
                     .map(book -> new BookEdge(cursorHelper.encode(book.getId()), book))
                     .collect(Collectors.toList());
 
+
+           
             String startCursor = edges.isEmpty() ? null : edges.get(0).getCursor();
             String endCursor = edges.isEmpty() ? null : edges.get(edges.size() - 1).getCursor();
 
@@ -132,7 +130,14 @@ public class GraphQLDataFetchers {
 
             PageInfo pageInfo = new PageInfo(startCursor, endCursor, hasNextPage, hasPreviousPage);
 
-            return new BookConnection(edges, pageInfo);
+            var x =  new BookConnection(edges, pageInfo);
+
+             LOG.info("Pagination args -> first: {}, last: {}, before: '{}', after: '{}'", x.toString());
+            LOG.info("Pagination args -> first: {}, last: {}, before: '{}', after: '{}'", x.toString());
+            LOG.info("Pagination args -> first: {}, last: {}, before: '{}', after: '{}'", x.toString());
+            LOG.info("Pagination args -> first: {}, last: {}, before: '{}', after: '{}'", x.toString());
+
+            return x;
         };
     }
 
