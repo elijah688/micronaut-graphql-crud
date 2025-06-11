@@ -20,7 +20,7 @@ import java.util.Optional;
 
 import static graphql.schema.idl.TypeRuntimeWiring.newTypeWiring;
 
-@Factory 
+@Factory
 public class GraphQLFactory {
 
     private static final Logger LOG = LoggerFactory.getLogger(GraphQLFactory.class);
@@ -28,27 +28,27 @@ public class GraphQLFactory {
     @Bean
     @Singleton
     public GraphQL graphQL(ResourceResolver resourceResolver,
-                           GraphQLDataFetchers graphQLDataFetchers) {
-        SchemaParser schemaParser = new SchemaParser(); 
+            GraphQLDataFetchers graphQLDataFetchers) {
+        SchemaParser schemaParser = new SchemaParser();
 
         TypeDefinitionRegistry typeRegistry = new TypeDefinitionRegistry();
-        Optional<InputStream> graphqlSchema = resourceResolver.getResourceAsStream("classpath:schema.graphqls"); 
+        Optional<InputStream> graphqlSchema = resourceResolver.getResourceAsStream("classpath:schema.graphqls");
 
         if (graphqlSchema.isPresent()) {
-            typeRegistry.merge(schemaParser.parse(new BufferedReader(new InputStreamReader(graphqlSchema.get())))); 
+            typeRegistry.merge(schemaParser.parse(new BufferedReader(new InputStreamReader(graphqlSchema.get()))));
 
-
-            RuntimeWiring runtimeWiring = RuntimeWiring.newRuntimeWiring() 
+            RuntimeWiring runtimeWiring = RuntimeWiring.newRuntimeWiring()
                     .type(newTypeWiring("Query")
-                            .dataFetcher("bookById", graphQLDataFetchers.getBookByIdDataFetcher())) 
-                    .type(newTypeWiring("Book")
-                            .dataFetcher("author", graphQLDataFetchers.getAuthorDataFetcher())) 
+                            .dataFetcher("bookById", graphQLDataFetchers.getBookByIdDataFetcher())
+                            .dataFetcher("books", graphQLDataFetchers.getBooksDataFetcher())) 
+                    .type(newTypeWiring("Mutation")
+                            .dataFetcher("upsertBook", graphQLDataFetchers.upsertBookDataFetcher()))
                     .build();
 
             SchemaGenerator schemaGenerator = new SchemaGenerator();
-            GraphQLSchema graphQLSchema = schemaGenerator.makeExecutableSchema(typeRegistry, runtimeWiring); 
+            GraphQLSchema graphQLSchema = schemaGenerator.makeExecutableSchema(typeRegistry, runtimeWiring);
 
-            return GraphQL.newGraphQL(graphQLSchema).build(); 
+            return GraphQL.newGraphQL(graphQLSchema).build();
 
         } else {
             LOG.debug("No GraphQL services found, returning empty schema");
