@@ -1,0 +1,12 @@
+[
+  {
+    "condition":{"typeReachable":"org.hibernate.id.factory.internal.StandardIdentifierGeneratorFactory"},
+    "name":"org.hibernate.generator.internal.CurrentTimestampGeneration",
+    "queryAllDeclaredConstructors":true,
+    "methods":[
+      {"name":"<init>","parameterTypes":["org.hibernate.annotations.CreationTimestamp","java.lang.reflect.Member","org.hibernate.generator.GeneratorCreationContext"] },
+      {"name":"<init>","parameterTypes":["org.hibernate.annotations.CurrentTimestamp","java.lang.reflect.Member","org.hibernate.generator.GeneratorCreationContext"] },
+      {"name":"<init>","parameterTypes":["org.hibernate.annotations.UpdateTimestamp","java.lang.reflect.Member","org.hibernate.generator.GeneratorCreationContext"] }
+    ]
+  }
+]

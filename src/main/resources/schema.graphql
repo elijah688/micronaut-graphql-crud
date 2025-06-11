@@ -1,0 +1,53 @@
+type Query {
+  bookById(id: ID): Book
+  books(first: Int, last: Int, before: String, after: String): BookConnection
+  authorById(id: ID!): Author
+}
+
+type Mutation {
+  upsertBook(input: UpsertBookInput!): Book
+  upsertAuthor(input: UpsertAuthorInput!): Author
+}
+
+input UpsertBookInput {
+  id: ID
+  name: String!
+  pageCount: Int!
+  authorId: ID!
+}
+
+input UpsertAuthorInput {
+  id: ID
+  firstName: String!
+  lastName: String!
+}
+
+type Book {
+  id: ID!
+  name: String!
+  pageCount: Int!
+  author: Author!
+}
+
+type Author {
+  id: ID!
+  firstName: String!
+  lastName: String!
+}
+
+type BookEdge {
+  cursor: String!
+  node: Book!
+}
+
+type PageInfo {
+  startCursor: String
+  endCursor: String
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+}
+
+type BookConnection {
+  edges: [BookEdge!]!
+  pageInfo: PageInfo!
+}
