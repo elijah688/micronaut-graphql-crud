@@ -1,5 +1,6 @@
 package example.micronaut.service;
 
+import java.time.Instant;
 import java.util.UUID;
 
 import org.slf4j.Logger;
@@ -26,6 +27,6 @@ public class AuthorService {
     }
 
     public Author upsertAuthor(Author author) {
-        return authorRepository.upsert(author.getId(), author.getFirstName(), author.getLastName());
+        return authorRepository.upsert(author.getId(), author.getFirstName(), author.getLastName(), Instant.now());
     }
 }

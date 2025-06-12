@@ -7,6 +7,7 @@ import io.micronaut.data.model.Pageable;
 import io.micronaut.data.model.Sort;
 import jakarta.inject.Singleton;
 
+import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -54,7 +55,7 @@ public class BookService {
     }
 
     public Book upsertBook(Book book) {
-        return bookRepository.upsert(book.getId(), book.getAuthor().getId(), book.getName(), book.getPageCount());
+        return bookRepository.upsert(book.getId(), book.getAuthor().getId(), book.getName(), book.getPageCount(), Instant.now());
     }
 
 }
