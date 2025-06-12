@@ -22,6 +22,7 @@ public class AuthorService {
 
     public Author getAuthorById(UUID id) {
         return authorRepository.findById(id).orElse(null);
+
     }
 
     public Author upsertAuthor(Author author) {
