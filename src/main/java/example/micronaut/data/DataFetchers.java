@@ -44,8 +44,15 @@ public class DataFetchers {
             String before = env.getArgument("before");
             String after = env.getArgument("after");
 
-            List<Book> allBooks = bookService.getBooks(UUID.fromString(before), UUID.fromString(after), first, last);
+            UUID beforeUuid = before != null ? UUID.fromString(before) : null;
+            UUID afterUuid = after != null ? UUID.fromString(after) : null;
 
+            List<Book> allBooks = bookService.getBooks(beforeUuid, afterUuid, first, last);
+
+            LOG.info(allBooks.toString());
+            LOG.info(allBooks.toString());
+            LOG.info(allBooks.toString());
+            LOG.info(allBooks.toString());
             // Cursor helper for encoding/decoding
             class CursorHelper {
                 String encode(UUID id) {
@@ -124,7 +131,6 @@ public class DataFetchers {
             if (id != null) {
                 author.setId(UUID.fromString(id));
             }
-
 
             return authorService.upsertAuthor(author);
         };

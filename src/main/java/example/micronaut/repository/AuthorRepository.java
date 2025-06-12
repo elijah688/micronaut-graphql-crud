@@ -13,14 +13,15 @@ public interface AuthorRepository extends CrudRepository<Author, UUID> {
     Optional<Author> findById(UUID id);
 
     @Query(value = """
-            INSERT INTO authors (id, first_name, last_name)
-            VALUES (:id, :firstName, :lastName)
+            INSERT INTO authors (id, first_name, last_name, created_at, updated_at)
+            VALUES (:id, :firstName, :lastName, :createdAt, now())
             ON CONFLICT (id) DO UPDATE
               SET first_name = EXCLUDED.first_name,
-                  last_name = EXCLUDED.last_name
+                  last_name = EXCLUDED.last_name,
+                  updated_at = now()
             RETURNING *
             """, nativeQuery = true)
-    Author upsert(UUID id, String firstName, String lastName);
+    Author upsert(UUID id, String firstName, String lastName, java.time.Instant createdAt);
 
     boolean existsById(UUID id);
 
