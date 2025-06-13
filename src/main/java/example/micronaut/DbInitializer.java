@@ -2,41 +2,44 @@ package example.micronaut;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.inject.Singleton;
-import javax.sql.DataSource;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import io.micronaut.transaction.annotation.Transactional;
+
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.sql.Connection;
 import java.sql.Statement;
 import java.util.Scanner;
+import io.micronaut.data.jdbc.runtime.JdbcOperations;
+
 
 @Singleton
 public class DbInitializer {
 
-    private final DataSource dataSource;
+    private static final Logger LOG = LoggerFactory.getLogger(DbInitializer.class);
 
-    public DbInitializer(DataSource dataSource) {
-        this.dataSource = dataSource;
+    private final JdbcOperations jdbcOperations;
+
+    public DbInitializer(JdbcOperations jdbcOperations) {
+        this.jdbcOperations = jdbcOperations;
     }
 
     @PostConstruct
+    @Transactional
     public void init() {
-        try (Connection connection = dataSource.getConnection();
-             Statement statement = connection.createStatement()) {
+        LOG.info("Initializing DB from tables.sql...");
+        String sql = readSqlFromClasspath("/sql/tables.sql");
 
-            var rs = connection.getMetaData().getTables(null, null, "authors", null);
-            if (rs.next()) {
-                System.out.println("Table 'authors' already exists. Skipping initialization.");
-                return;
+        jdbcOperations.execute(connection -> {
+            try (Statement stmt = connection.createStatement()) {
+                stmt.execute(sql);
             }
+            return null;
+        });
 
-            System.out.println("Initializing DB from tables.sql...");
-            String sql = readSqlFromClasspath("/sql/tables.sql");
-            statement.execute(sql);
-            System.out.println("DB initialization complete.");
-
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to initialize database", e);
-        }
+        LOG.info("DB initialization complete.");
     }
 
     private String readSqlFromClasspath(String path) {

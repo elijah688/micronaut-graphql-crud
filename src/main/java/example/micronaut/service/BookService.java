@@ -4,7 +4,6 @@ import example.micronaut.graphql.GraphQLFactory;
 import example.micronaut.model.Book;
 import example.micronaut.repository.BookRepository;
 import io.micronaut.data.model.Pageable;
-import io.micronaut.data.model.Sort;
 import jakarta.inject.Singleton;
 
 import java.time.Instant;
@@ -17,7 +16,6 @@ import org.slf4j.LoggerFactory;
 
 @Singleton
 public class BookService {
-    private static final Logger LOG = LoggerFactory.getLogger(GraphQLFactory.class);
 
     private final BookRepository bookRepository;
 

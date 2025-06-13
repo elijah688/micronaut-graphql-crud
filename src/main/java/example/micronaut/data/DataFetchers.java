@@ -13,8 +13,6 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import javax.print.DocFlavor.STRING;
-
 @Singleton
 public class DataFetchers {
 

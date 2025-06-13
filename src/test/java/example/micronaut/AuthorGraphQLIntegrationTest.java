@@ -16,7 +16,7 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@MicronautTest
+@MicronautTest(application = Application.class, packages = "example.micronaut")
 public class AuthorGraphQLIntegrationTest {
 
     @Inject
@@ -26,15 +26,19 @@ public class AuthorGraphQLIntegrationTest {
     @Inject
     ObjectMapper objectMapper;
 
+    @Inject
+    DbInitializer dbInitializer;
+
     @Test
     void insertAuthors() {
+        assertNotNull(dbInitializer);
+
         List<String> mutations = List.of(
-            "mutation { upsertAuthor(input: {firstName: \"Alice\", lastName: \"Smith\"}) { id firstName lastName } }",
-            "mutation { upsertAuthor(input: {firstName: \"Bob\",   lastName: \"Johnson\"}) { id firstName lastName } }",
-            "mutation { upsertAuthor(input: {firstName: \"Carol\", lastName: \"Williams\"}) { id firstName lastName } }"
-        );
+                "mutation { upsertAuthor(input: {firstName: \"Alice\", lastName: \"Smith\"}) { id firstName lastName } }",
+                "mutation { upsertAuthor(input: {firstName: \"Bob\",   lastName: \"Johnson\"}) { id firstName lastName } }",
+                "mutation { upsertAuthor(input: {firstName: \"Carol\", lastName: \"Williams\"}) { id firstName lastName } }");
         List<String> expectedFirstNames = List.of("Alice", "Bob", "Carol");
-        List<String> expectedLastNames  = List.of("Smith", "Johnson", "Williams");
+        List<String> expectedLastNames = List.of("Smith", "Johnson", "Williams");
 
         for (int i = 0; i < mutations.size(); i++) {
             String mutation = mutations.get(i);
@@ -49,7 +53,7 @@ public class AuthorGraphQLIntegrationTest {
             Map<String, Object> author = (Map<String, Object>) data.get("upsertAuthor");
             assertNotNull(author.get("id"), "Author ID should not be null");
             assertEquals(expectedFirstNames.get(i), author.get("firstName"));
-            assertEquals(expectedLastNames.get(i),  author.get("lastName"));
+            assertEquals(expectedLastNames.get(i), author.get("lastName"));
         }
     }
 
@@ -59,8 +63,7 @@ public class AuthorGraphQLIntegrationTest {
             String json = objectMapper.writeValueAsString(Map.of("query", query));
             HttpRequest<String> request = HttpRequest.POST("/", json);
             HttpResponse<Map<String, Object>> response = client.toBlocking().exchange(
-                request, Argument.mapOf(String.class, Object.class)
-            );
+                    request, Argument.mapOf(String.class, Object.class));
             assertEquals(HttpStatus.OK, response.getStatus());
             return response.body();
         } catch (Exception e) {
