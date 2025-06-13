@@ -6,7 +6,6 @@ import jakarta.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.micronaut.transaction.annotation.Transactional;
 
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -27,7 +26,6 @@ public class DbInitializer {
     }
 
     @PostConstruct
-    @Transactional
     public void init() {
         LOG.info("Initializing DB from tables.sql...");
         String sql = readSqlFromClasspath("/sql/tables.sql");
