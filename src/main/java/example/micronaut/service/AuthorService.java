@@ -6,14 +6,15 @@ import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import example.micronaut.data.DataFetchers;
 import example.micronaut.model.Author;
 import example.micronaut.repository.AuthorRepository;
 import jakarta.inject.Singleton;
 
+import io.micronaut.security.annotation.Secured;
+import io.micronaut.security.rules.SecurityRule;
 @Singleton
 public class AuthorService {
-    private static final Logger LOG = LoggerFactory.getLogger(DataFetchers.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AuthorService.class);
 
     private final AuthorRepository authorRepository;
 
@@ -21,11 +22,12 @@ public class AuthorService {
         this.authorRepository = authorRepository;
     }
 
+    @Secured(SecurityRule.IS_AUTHENTICATED)
     public Author getAuthorById(UUID id) {
         return authorRepository.findById(id).orElse(null);
-
     }
 
+    @Secured(SecurityRule.IS_AUTHENTICATED)
     public Author upsertAuthor(Author author) {
         return authorRepository.upsert(author.getId(), author.getFirstName(), author.getLastName(), Instant.now());
     }

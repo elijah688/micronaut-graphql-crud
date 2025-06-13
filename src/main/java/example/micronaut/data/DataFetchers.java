@@ -5,13 +5,12 @@ import jakarta.inject.Singleton;
 import example.micronaut.service.AuthorService;
 import example.micronaut.service.BookService;
 import example.micronaut.model.*;
-import example.micronaut.model.BookConnection.*;
+
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Singleton
 public class DataFetchers {
