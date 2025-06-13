@@ -21,9 +21,7 @@ public class DataFetchers {
     private final BookService bookService;
     private final AuthorService authorService;
 
-    public DataFetchers(
-            BookService bookService,
-            AuthorService authorService) {
+    public DataFetchers(BookService bookService, AuthorService authorService) {
         this.bookService = bookService;
         this.authorService = authorService;
     }
@@ -36,50 +34,21 @@ public class DataFetchers {
     }
 
     public DataFetcher<BookConnection> getBooksDataFetcher() {
-        return env -> {
-            Integer first = env.getArgument("first");
-            Integer last = env.getArgument("last");
-            String before = env.getArgument("before");
-            String after = env.getArgument("after");
+    return env -> {
+        Integer first = env.getArgument("first");
+        Integer last = env.getArgument("last");
+        String before = env.getArgument("before");
+        String after = env.getArgument("after");
 
-            UUID beforeUuid = before != null ? UUID.fromString(before) : null;
-            UUID afterUuid = after != null ? UUID.fromString(after) : null;
+        BookConnection bookConnection = bookService.getBooksConnection(before, after, first, last);
 
-            List<Book> allBooks = bookService.getBooks(beforeUuid, afterUuid, first, last);
+        LOG.info("Fetched {} books with pagination", 
+            bookConnection.getEdges() != null ? bookConnection.getEdges().size() : 0);
 
-            LOG.info(allBooks.toString());
-            LOG.info(allBooks.toString());
-            LOG.info(allBooks.toString());
-            LOG.info(allBooks.toString());
-            // Cursor helper for encoding/decoding
-            class CursorHelper {
-                String encode(UUID id) {
-                    return Base64.getEncoder().encodeToString(id.toString().getBytes());
-                }
-            }
+        return bookConnection;
+    };
+}
 
-            CursorHelper cursorHelper = new CursorHelper();
-
-            // Build edges
-            List<BookEdge> edges = allBooks.stream()
-                    .map(book -> new BookEdge(cursorHelper.encode(book.getId()), book))
-                    .collect(Collectors.toList());
-
-            String startCursor = edges.isEmpty() ? null : edges.get(0).getCursor();
-            String endCursor = edges.isEmpty() ? null : edges.get(edges.size() - 1).getCursor();
-
-            // hasNextPage and hasPreviousPage logic simplified (could be improved)
-            boolean hasNextPage = false;
-            boolean hasPreviousPage = false;
-
-            PageInfo pageInfo = new PageInfo(startCursor, endCursor, hasNextPage, hasPreviousPage);
-            BookConnection bookConnection = new BookConnection(edges, pageInfo);
-
-            LOG.info("Fetched {} books with pagination", edges.size());
-
-            return bookConnection;
-        };
-    }
 
     public DataFetcher<Book> upsertBookDataFetcher() {
         return env -> {
@@ -90,7 +59,7 @@ public class DataFetchers {
             Integer pageCount = (Integer) input.get("pageCount");
             String authorId = (String) input.get("authorId");
 
-            Book book = id != null ? bookService.getBookById(UUID.fromString(id)) : null;
+            Book book = (id != null) ? bookService.getBookById(UUID.fromString(id)) : null;
             if (book == null) {
                 book = new Book();
                 book.setId(UUID.randomUUID());
@@ -125,7 +94,6 @@ public class DataFetchers {
             String lastName = (String) input.get("lastName");
 
             Author author = new Author(UUID.randomUUID(), firstName, lastName);
-
             if (id != null) {
                 author.setId(UUID.fromString(id));
             }

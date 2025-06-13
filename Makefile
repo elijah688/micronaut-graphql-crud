@@ -36,9 +36,13 @@ db_up:
 db_down:
 	@echo ">>> Tearing down Postgres container '$(DB_CONTAINER_NAME)'..."
 	docker rm -f $(DB_CONTAINER_NAME) > /dev/null 2>&1 || true
-
-test: db_up
-	@echo ">>> Running tests…"
-	./gradlew clean test --rerun-tasks --no-build-cache --info
-	@echo ">>> Tests complete, tearing down DB…"
-	$(MAKE) db_down
+test:
+	@echo ">>> Running tests with isolated DB…"
+	@$(MAKE) db_up
+	@{ \
+		./gradlew clean test --rerun-tasks --no-build-cache --info; \
+		EXIT_CODE=$$?; \
+		echo ">>> Tests complete (exit $$EXIT_CODE), tearing down DB…"; \
+		$(MAKE) db_down; \
+		exit $$EXIT_CODE; \
+	}

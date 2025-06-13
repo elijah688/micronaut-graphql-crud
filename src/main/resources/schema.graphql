@@ -23,16 +23,16 @@ input UpsertAuthorInput {
 }
 
 type Book {
-  id: ID
-  name: String
-  pageCount: Int
-  author: Author
+  id: ID!
+  name: String!
+  pageCount: Int!
+  author: Author!
 }
 
 type Author {
-  id: ID
-  firstName: String
-  lastName: String
+  id: ID!
+  firstName: String!
+  lastName: String!
 }
 
 type BookEdge {
