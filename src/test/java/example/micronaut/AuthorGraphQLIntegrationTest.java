@@ -125,11 +125,10 @@ public class AuthorGraphQLIntegrationTest {
 
     @Test
     @Order(7)
-
     void paginationTest() {
         bookRepo.deleteAll();
 
-        // Insert 25 books with names "Book 01" to "Book 25"
+        // Insert 25 books named "Book 01" to "Book 25"
         for (int i = 1; i <= 25; i++) {
             String name = String.format("Book %02d", i);
             String mutation = String.format(
@@ -138,7 +137,7 @@ public class AuthorGraphQLIntegrationTest {
             makeRequest(mutation);
         }
 
-        // Fetch first 10 books
+        // 1) Fetch first 10 books
         Map<String, Object> first10Resp = getData(makeRequest("""
                 query {
                     books(first: 10) {
@@ -155,7 +154,7 @@ public class AuthorGraphQLIntegrationTest {
 
         String afterCursor10 = (String) ((Map<String, Object>) first10Resp.get("pageInfo")).get("endCursor");
 
-        // Fetch next 5 after endCursor of first 10
+        // 2) Fetch next 5 books after Book 10 using after + first
         Map<String, Object> after10Next5 = getData(makeRequest(String.format("""
                 query {
                     books(first: 5, after: "%s") {
@@ -172,7 +171,7 @@ public class AuthorGraphQLIntegrationTest {
 
         String after15Cursor = (String) ((Map<String, Object>) after10Next5.get("pageInfo")).get("endCursor");
 
-        // Fetch 5 before Book 15 using `before` with last:5
+        // 3) Fetch 5 books before Book 15 using before + last (backward pagination)
         Map<String, Object> before15Prev5 = getData(makeRequest(String.format("""
                 query {
                     books(last: 5, before: "%s") {
@@ -187,7 +186,7 @@ public class AuthorGraphQLIntegrationTest {
         assertEquals("Book 10", getBookName(edgesBefore15.get(0)));
         assertEquals("Book 14", getBookName(edgesBefore15.get(4)));
 
-        // Fetch last 5 books
+        // 4) Fetch last 5 books overall
         Map<String, Object> last5Resp = getData(makeRequest("""
                 query {
                     books(last: 5) {
@@ -202,8 +201,8 @@ public class AuthorGraphQLIntegrationTest {
         assertEquals("Book 21", getBookName(edgesLast5.get(0)));
         assertEquals("Book 25", getBookName(edgesLast5.get(4)));
 
-        // Fetch middle 5 books with after + first (after Book 05)
-        String after5Cursor = (String) edgesFirst10.get(4).get("cursor"); // cursor after Book 05
+        // 5) Fetch middle 5 books after Book 05 using after + first
+        String after5Cursor = (String) edgesFirst10.get(4).get("cursor"); // cursor at Book 05
 
         Map<String, Object> middle5 = getData(makeRequest(String.format("""
                 query {
@@ -221,7 +220,7 @@ public class AuthorGraphQLIntegrationTest {
 
         String middle5EndCursor = (String) ((Map<String, Object>) middle5.get("pageInfo")).get("endCursor");
 
-        // Go back with before + last (before middle5 end cursor)
+        // 6) Go back 5 books before the end cursor of the middle 5 using before + last
         Map<String, Object> rewind5 = getData(makeRequest(String.format("""
                 query {
                     books(last: 5, before: "%s") {
@@ -231,11 +230,11 @@ public class AuthorGraphQLIntegrationTest {
                 """, middle5EndCursor)), "books");
 
         List<Map<String, Object>> rewindEdges = (List<Map<String, Object>>) rewind5.get("edges");
-
-        rewindEdges.stream().forEach(e -> System.out.println(getBookName(e)));
         assertEquals(5, rewindEdges.size());
-        assertEquals("Book 01", getBookName(rewindEdges.get(0)));
-        assertEquals("Book 05", getBookName(rewindEdges.get(4)));
+        // The rewind should give books 05 to 09, since it's before the cursor at Book
+        // 10
+        assertEquals("Book 05", getBookName(rewindEdges.get(0)));
+        assertEquals("Book 09", getBookName(rewindEdges.get(4)));
     }
 
     @SuppressWarnings("unchecked")

@@ -36,28 +36,30 @@ public class BookService {
         boolean hasNextPage = false;
         boolean hasPreviousPage = false;
 
-        if (afterCursor != null) {
+        if (afterCursor != null && first != null) {
+            // Forward pagination
             CursorUtil.Cursor cursor = CursorUtil.decode(afterCursor);
             books = bookRepository.findAllAfter(cursor.createdAt(), cursor.id(), Pageable.from(0, size));
 
             if (!books.isEmpty()) {
+                Book firstBook = books.get(0);
                 Book lastBook = books.get(books.size() - 1);
+                hasPreviousPage = bookRepository.existsBefore(firstBook.getCreatedAt(), firstBook.getId());
                 hasNextPage = bookRepository.existsAfter(lastBook.getCreatedAt(), lastBook.getId());
-                hasPreviousPage = bookRepository.existsBefore(cursor.createdAt(), cursor.id());
             }
-        } else if (beforeCursor != null) {
+
+        } else if (beforeCursor != null && last != null) {
+            // Backward pagination (rewind)
             CursorUtil.Cursor cursor = CursorUtil.decode(beforeCursor);
-            books = bookRepository.findAllBefore(cursor.createdAt(), cursor.id(), Pageable.from(0, size));
-            Collections.reverse(books);
 
-            if (!books.isEmpty()) {
-                Book firstBook = books.get(0);
-                hasPreviousPage = bookRepository.existsBefore(firstBook.getCreatedAt(), firstBook.getId());
-                hasNextPage = bookRepository.existsAfter(cursor.createdAt(), cursor.id());
-            }
-        } else if (last != null) {
-            books = bookRepository.findLastBooks(Pageable.from(0, last));
-            Collections.reverse(books);
+            List<Book> fetchedDesc = bookRepository.findAllBefore(cursor.createdAt(), cursor.id(),
+                    Pageable.from(0, size + 1));
+            Collections.reverse(fetchedDesc); // now ASC order
+
+            // Take last N items (because DESC query gave most recent first)
+            books = fetchedDesc.stream()
+                    .skip(Math.max(0, fetchedDesc.size() - size))
+                    .collect(Collectors.toList());
 
             if (!books.isEmpty()) {
                 Book firstBook = books.get(0);
@@ -65,7 +67,25 @@ public class BookService {
                 hasPreviousPage = bookRepository.existsBefore(firstBook.getCreatedAt(), firstBook.getId());
                 hasNextPage = bookRepository.existsAfter(lastBook.getCreatedAt(), lastBook.getId());
             }
+
+        } else if (last != null) {
+            // Last page without cursor (last N books overall)
+            List<Book> fetchedDesc = bookRepository.findLastBooks(Pageable.from(0, last + 1));
+            Collections.reverse(fetchedDesc); // now ASC order
+
+            books = fetchedDesc.stream()
+                    .skip(Math.max(0, fetchedDesc.size() - last))
+                    .collect(Collectors.toList());
+
+            if (!books.isEmpty()) {
+                Book firstBook = books.get(0);
+                Book lastBook = books.get(books.size() - 1);
+                hasPreviousPage = bookRepository.existsBefore(firstBook.getCreatedAt(), firstBook.getId());
+                hasNextPage = bookRepository.existsAfter(lastBook.getCreatedAt(), lastBook.getId());
+            }
+
         } else {
+            // First page or forward pagination without cursor
             books = bookRepository.findFirstBooks(Pageable.from(0, size));
 
             if (!books.isEmpty()) {
